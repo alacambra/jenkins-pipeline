@@ -54,6 +54,7 @@ def checkoutGitRepos() {
 
 def buildUnitTest() {
     echo "Building and testing"
+}
 
 def unitTestReports() {
     echo "generating reports"
