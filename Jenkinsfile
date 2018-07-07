@@ -79,7 +79,7 @@ def addAnalysisMetaInfo() {
 }
 
 def systemTest() {
-    deploy("systemtest", info)
+    deploy("systemtest")
     systemTestReports()
     addSystemTestMetaInfo()
 }
@@ -93,7 +93,7 @@ def addSystemTestMetaInfo() {
 }
 
 def deployStaging() {
-    deploy("staging", info)
+    deploy("staging")
 }
 
 def deployProduction() {
