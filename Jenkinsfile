@@ -1,6 +1,8 @@
 #!/usr/bin/env groovy
 import com.sebastian_daschner.jenkins.pipeline.MetaInfo
 
+@Library('jenkins-pipeline-lib') _
+
 node {
     prepare()
 
