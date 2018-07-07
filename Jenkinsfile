@@ -42,7 +42,7 @@ def prepare() {
                             dockerImage       : 'project-name',
                             dbMigrationImage  : 'project-name-db-migration',
                             databaseRolloutDir: 'dir/database/rollouts/'])
-}
+
     deleteDir()
     checkoutGitRepos()
     
