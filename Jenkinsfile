@@ -1,7 +1,4 @@
 #!/usr/bin/env groovy
-import com.sebastian_daschner.jenkins.pipeline.MetaInfo
-
-@Library('jenkins-pipeline-lib') _
 
 node {
     prepare()
@@ -39,12 +36,6 @@ stage('deploy') {
 }
 
 def prepare() {
-    info = metaInfo.create([commit            : "commit",
-                            projectName       : 'project-name',
-                            dockerImage       : 'project-name',
-                            dbMigrationImage  : 'project-name-db-migration',
-                            databaseRolloutDir: 'dir/database/rollouts/'])
-
     deleteDir()
     checkoutGitRepos()
     
@@ -115,8 +106,8 @@ def buildPushDocker(String imageTag, String directory) {
     echo "buildPushDocker"
 }
 
-def deploy(String namespace, MetaInfo info) {
-    echo "deploying ${info.dockerImage} to Kubernetes ${namespace}"
+def deploy(String namespace) {
+    echo "deploy"
 }
 
 def updateDeploymentImages(String dockerImage, String namespace, String databaseVersion) {
