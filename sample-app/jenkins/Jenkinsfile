@@ -1,0 +1,39 @@
+#!/usr/bin/env groovy
+import com.sebastian_daschner.jenkins.pipeline.MetaInfo
+
+@Library('jenkins-pipeline-lib') _
+
+node {
+    prepare()
+
+    stage('build-ut') {
+        buildUnitTest()
+    }
+}
+
+stage('deploy') {
+    input 'Deploy to production?'
+    node {
+        deployProduction()
+    }
+}
+
+def prepare() {
+    deleteDir()
+    checkoutGitRepos()
+}
+
+def checkoutGitRepos() {
+    coffeeShopCommit = git.checkoutToDir('ssh://git@git.example.com/coffee-shop.git', 'coffee-shop')
+    git.checkoutToDir('ssh://git@git.example.com/versions.git', 'versions')
+    git.checkoutToDir('ssh://git@git.example.com/coffee-shop-st.git', 'coffee-shop-st')
+}
+
+def buildUnitTest() {
+    mvn.cleanPackage(info.buildVersion, 'coffee-shop')
+    unitTestReports()
+}
+
+def unitTestReports() {
+    junit 'coffee-shop/target/surefire-reports/**/*.xml'
+}
