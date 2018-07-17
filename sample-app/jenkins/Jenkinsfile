@@ -1,7 +1,4 @@
 #!/usr/bin/env groovy
-import com.sebastian_daschner.jenkins.pipeline.MetaInfo
-
-@Library('jenkins-pipeline-lib') _
 
 node {
     prepare()
@@ -11,29 +8,32 @@ node {
     }
 }
 
-stage('deploy') {
-    input 'Deploy to production?'
-    node {
-        deployProduction()
-    }
-}
-
 def prepare() {
-    deleteDir()
     checkoutGitRepos()
 }
 
 def checkoutGitRepos() {
-    coffeeShopCommit = git.checkoutToDir('ssh://git@git.example.com/coffee-shop.git', 'coffee-shop')
-    git.checkoutToDir('ssh://git@git.example.com/versions.git', 'versions')
-    git.checkoutToDir('ssh://git@git.example.com/coffee-shop-st.git', 'coffee-shop-st')
+    checkout([
+            $class                           : 'GitSCM',
+            branches                         : [[name: "refs/heads/master"]],
+            doGenerateSubmoduleConfigurations: false,
+            extensions                       : [
+                    [$class: 'RelativeTargetDirectory', relativeTargetDir: "sample-app"],
+            ],
+            submoduleCfg                     : [],
+            userRemoteConfigs                : [[credentialsId: 'jenkins-github', url: "git@github.com:alacambra/jenkins-pipeline.git"]]
+    ])
 }
 
 def buildUnitTest() {
-    mvn.cleanPackage(info.buildVersion, 'coffee-shop')
+    dir("hello-app") {
+        def mvnHome = tool name: 'Maven3', type: 'maven'
+        sh "${mvnHome}/bin/mvn -B test -DbuildNumber=b1"
+    }
+    //mvn.cleanPackage("1", 'hello-app')
     unitTestReports()
 }
 
 def unitTestReports() {
-    junit 'coffee-shop/target/surefire-reports/**/*.xml'
+    junit 'hello-app/target/surefire-reports/**/*.xml'
 }
