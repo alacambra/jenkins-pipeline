@@ -1,10 +1,14 @@
 #!/usr/bin/env groovy
 
-node {
+node("master") {
     prepare()
 
     stage('build-ut') {
         buildUnitTest()
+    }
+
+    stage('scp') {
+        copyToWf()
     }
 }
 
@@ -18,7 +22,7 @@ def checkoutGitRepos() {
             branches                         : [[name: "refs/heads/master"]],
             doGenerateSubmoduleConfigurations: false,
             extensions                       : [
-                    [$class: 'RelativeTargetDirectory', relativeTargetDir: "sample-app"],
+                    [$class: 'RelativeTargetDirectory', relativeTargetDir: "code"],
             ],
             submoduleCfg                     : [],
             userRemoteConfigs                : [[credentialsId: 'jenkins-github', url: "git@github.com:alacambra/jenkins-pipeline.git"]]
@@ -26,14 +30,23 @@ def checkoutGitRepos() {
 }
 
 def buildUnitTest() {
-    dir("hello-app") {
+    dir("code/sample-app/hello-app") {
         def mvnHome = tool name: 'Maven3', type: 'maven'
-        sh "${mvnHome}/bin/mvn -B test -DbuildNumber=b1"
+        sh "ls -la /etc/alternatives/java && ${mvnHome}/bin/mvn -B test package -DbuildNumber=b1"
     }
     //mvn.cleanPackage("1", 'hello-app')
     unitTestReports()
 }
 
+def copyToWf(){
+     withCredentials([sshUserPrivateKey(credentialsId: "aws_pkm15", keyFileVariable: 'keyfile')]) {
+        sh "ls -la"
+        sh "pwd"
+        sh "ls -la code/sample-app/hello-app/target/"
+        sh "scp -vi ${keyfile} code/sample-app/hello-app/target/app.war ubuntu@54.190.57.14:/home/ubuntu/wildfly-13.0.0.Final/standalone/deployments"
+   }
+}
+
 def unitTestReports() {
-    junit 'hello-app/target/surefire-reports/**/*.xml'
+    junit 'code/sample-app/hello-app/target/surefire-reports/**/*.xml'
 }
