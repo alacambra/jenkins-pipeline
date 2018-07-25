@@ -7,7 +7,9 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.locks.LockSupport;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public class HelloClient extends ExternalResource {
@@ -15,7 +17,8 @@ public class HelloClient extends ExternalResource {
     private static final int STARTUP_TIMEOUT = 30;
     private static final int STARTUP_PING_DELAY = 30;
 
-    private String helloUri = "http://localhost:8080/app/resources/hello";
+    private String testServer = "localhost";
+    private Supplier<String> helloUri = () -> "http://" + testServer + ":8080/app/resources/hello";
     private Pattern helloUriPattern = Pattern.compile(helloUri + "/[a-z0-9\\-]+");
     private WebTarget helloTarget;
     private Client client;
@@ -27,7 +30,8 @@ public class HelloClient extends ExternalResource {
     @Override
     protected void before() throws Throwable {
         client = ClientBuilder.newClient();
-        helloTarget = client.target(URI.create(helloUri));
+        testServer = Optional.ofNullable(System.getenv("TEST_SERVER")).orElse(testServer);
+        helloTarget = client.target(URI.create(helloUri.get()));
         waitForApplicationStartUp();
     }
 
