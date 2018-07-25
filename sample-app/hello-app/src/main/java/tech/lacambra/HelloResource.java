@@ -10,6 +10,9 @@ public class HelloResource {
 
     @GET
     public Response sayHello() {
+
+        System.out.println("Saying helloooooo");
+
         return Response.ok(
                 Json.createObjectBuilder()
                         .add("hello", "hello")

@@ -30,6 +30,7 @@ pipeline {
         stage('system-test') {
             steps{
                 copyToWf()
+                runST()
                 removeFromWf()
             }
         }
@@ -70,11 +71,16 @@ def copyToWf(){
         sh "scp -vi ${keyfile} code/sample-app/hello-app/target/app.war ubuntu@${TEST_SERVER}:/home/ubuntu/wildfly-13.0.0.Final/standalone/deployments"
    }
 }
+
+def runST(){
+    dir("code/sample-app/hello-st") {
+        def mvnHome = tool name: 'Maven3', type: 'maven'
+        sh "ls -la /etc/alternatives/java && ${mvnHome}/bin/mvn -B failsafe:integration-test package -DbuildNumber=b1"
+    }
+}
+
 def removeFromWf(){
      withCredentials([sshUserPrivateKey(credentialsId: "aws_pkm15", keyFileVariable: 'keyfile')]) {
-        sh "ls -la"
-        sh "pwd"
-        sh "ls -la code/sample-app/hello-app/target/"
         sh "ssh -vi ${keyfile} ubuntu@${TEST_SERVER} rm /home/ubuntu/wildfly-13.0.0.Final/standalone/deployments/app.war"
    }
 }
