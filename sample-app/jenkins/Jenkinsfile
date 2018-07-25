@@ -1,14 +1,37 @@
 #!/usr/bin/env groovy
 
-node("master") {
-    prepare()
+pipeline {
+    agent any
 
-    stage('build-ut') {
-        buildUnitTest()
+    environment {
+        TEST_SERVER = '34.209.37.159'
     }
 
-    stage('scp') {
-        copyToWf()
+    stages {
+
+        stage('print-env'){
+            steps{
+                sh 'printenv'
+            }
+        }
+
+        stage('prepare'){
+            steps{
+                prepare()
+            }
+        }
+    
+        stage('build-ut') {
+            steps{
+                buildUnitTest()
+            }
+        }
+
+        stage('scp') {
+            steps{
+                copyToWf()
+            }
+        }
     }
 }
 
@@ -43,7 +66,7 @@ def copyToWf(){
         sh "ls -la"
         sh "pwd"
         sh "ls -la code/sample-app/hello-app/target/"
-        sh "scp -vi ${keyfile} code/sample-app/hello-app/target/app.war ubuntu@54.190.57.14:/home/ubuntu/wildfly-13.0.0.Final/standalone/deployments"
+        sh "scp -vi ${keyfile} code/sample-app/hello-app/target/app.war ubuntu@${TEST_SERVER}:/home/ubuntu/wildfly-13.0.0.Final/standalone/deployments"
    }
 }
 
