@@ -8,7 +8,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Optional;
-import java.util.concurrent.locks.LockSupport;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -31,12 +30,18 @@ public class HelloClient extends ExternalResource {
     protected void before() throws Throwable {
         client = ClientBuilder.newClient();
         testServer = Optional.ofNullable(System.getenv("TEST_SERVER")).orElse(testServer);
+
+        System.out.println("Running test on uri=" + helloUri.get());
         helloTarget = client.target(URI.create(helloUri.get()));
         waitForApplicationStartUp();
     }
 
     private void waitForApplicationStartUp() {
-        LockSupport.parkNanos(1_000_000_000 * STARTUP_PING_DELAY);
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 //        final long timeout = System.currentTimeMillis() + STARTUP_TIMEOUT * 1000;
 //        while (helloTarget.request().head().getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
 //            System.out.println("waiting for application startup ...");
