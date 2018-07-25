@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import javax.ws.rs.core.Response;
 
-public class HelloRemoteTest {
+public class HelloRemoteIT {
 
     @Rule
     public HelloClient helloClient = new HelloClient();
