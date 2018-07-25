@@ -60,7 +60,7 @@ def buildUnitTest() {
         sh "ls -la /etc/alternatives/java && ${mvnHome}/bin/mvn -B test package -DbuildNumber=b1"
     }
     //mvn.cleanPackage("1", 'hello-app')
-    unitTestReports()
+    //unitTestReports()
 }
 
 def copyToWf(){
@@ -75,7 +75,7 @@ def copyToWf(){
 def runST(){
     dir("code/sample-app/hello-st") {
         def mvnHome = tool name: 'Maven3', type: 'maven'
-        sh "ls -la /etc/alternatives/java && ${mvnHome}/bin/mvn -B failsafe:integration-test"
+        sh "ls -la /etc/alternatives/java && ${mvnHome}/bin/mvn -B clean failsafe:integration-test"
     }
 }
 
