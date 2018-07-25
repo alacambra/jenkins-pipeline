@@ -6,13 +6,13 @@ import org.junit.Test;
 
 import javax.ws.rs.core.Response;
 
-public class HelloTest {
+public class HelloRemoteIT {
 
     @Rule
     public HelloClient helloClient = new HelloClient();
 
     @Test
-    public void sayHello() {
+    public void sayRemoteHello() {
         Response response = helloClient.sayHello();
         Assert.assertEquals(200, response.getStatus());
     }
