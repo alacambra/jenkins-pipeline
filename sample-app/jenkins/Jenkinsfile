@@ -75,7 +75,7 @@ def copyToWf(){
 def runST(){
     dir("code/sample-app/hello-st") {
         def mvnHome = tool name: 'Maven3', type: 'maven'
-        sh "ls -la /etc/alternatives/java && ${mvnHome}/bin/mvn failsafe:integration-test"
+        sh "ls -la /etc/alternatives/java && ${mvnHome}/bin/mvn test"
     }
 }
 
