@@ -27,9 +27,10 @@ pipeline {
             }
         }
 
-        stage('scp') {
+        stage('system-test') {
             steps{
                 copyToWf()
+                removeFromWf()
             }
         }
     }
@@ -67,6 +68,14 @@ def copyToWf(){
         sh "pwd"
         sh "ls -la code/sample-app/hello-app/target/"
         sh "scp -vi ${keyfile} code/sample-app/hello-app/target/app.war ubuntu@${TEST_SERVER}:/home/ubuntu/wildfly-13.0.0.Final/standalone/deployments"
+   }
+}
+def removeFromWf(){
+     withCredentials([sshUserPrivateKey(credentialsId: "aws_pkm15", keyFileVariable: 'keyfile')]) {
+        sh "ls -la"
+        sh "pwd"
+        sh "ls -la code/sample-app/hello-app/target/"
+        sh "ssh -vi ${keyfile} ubuntu@${TEST_SERVER} rm /home/ubuntu/wildfly-13.0.0.Final/standalone/deployments/app.war"
    }
 }
 
